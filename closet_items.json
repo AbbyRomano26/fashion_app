@@ -1,0 +1,72 @@
+[
+  {
+    "item_name": "White Button Down",
+    "category": "top",
+    "color": "black",
+    "style": "classic",
+    "brand": "Banana Republic",
+    "season": "all",
+    "formality": "business_casual",
+    "occasion": "class"
+  },
+  {
+    "item_name": "Green Striped Sweater",
+    "category": "top",
+    "color": "green",
+    "style": "casual",
+    "brand": "J. Crew",
+    "season": "cold",
+    "formality": "casual",
+    "occasion": "class"
+  },
+  {
+    "item_name": "Fluffy Cardigan",
+    "category": "top",
+    "color": "white",
+    "style": "classic",
+    "brand": "Unknown",
+    "season": "cold",
+    "formality": "business_casual",
+    "occasion": "office"
+  },
+  {
+    "item_name": "Suede and Fur Coat",
+    "category": "outerwear",
+    "color": "camel",
+    "style": "classic",
+    "brand": "Unknown",
+    "season": "cold",
+    "formality": "not specified",
+    "occasion": "not specified"
+  },
+  {
+    "item_name": "Straight Leg Jeans",
+    "category": "bottom",
+    "color": "navy",
+    "style": "classic",
+    "brand": "Levis",
+    "season": "all",
+    "formality": "not specified",
+    "occasion": "not specified"
+  },
+  {
+    "item_name": "Red Samba Sneakers",
+    "category": "shoes",
+    "color": "red",
+    "style": "classic",
+    "brand": "Adidas",
+    "season": "all",
+    "formality": "not specified",
+    "occasion": "not specified"
+  },
+  {
+    "item_name": "Red Sox Hat",
+    "category": "accessory",
+    "color": "navy",
+    "style": "casual",
+    "brand": "Unknown",
+    "season": "all",
+    "formality": "not specified",
+    "occasion": "not specified"
+  }
+]

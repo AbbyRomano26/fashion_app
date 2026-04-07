@@ -1,0 +1,246 @@
+[
+  {
+    "name": "t-shirt + pleated skirt",
+    "folder": "Weekend",
+    "filters": {
+      "dress_code": "casual",
+      "occasion": "class",
+      "weather": "warm",
+      "style": "any",
+      "color": "any",
+      "vibe": "polished"
+    },
+    "outfit": {
+      "success": true,
+      "items": {
+        "top": {
+          "item_name": "White T-Shirt",
+          "category": "top",
+          "formality": "casual",
+          "season": "warm",
+          "color": "white",
+          "style": "casual",
+          "occasion": "class",
+          "product_url": "https://www.uniqlo.com/us/en/search?q=white+t-shirt",
+          "brand": "Uniqlo"
+        },
+        "bottom": {
+          "item_name": "Pleated Skirt",
+          "category": "bottom",
+          "formality": "casual",
+          "season": "warm",
+          "color": "gray",
+          "style": "minimal",
+          "occasion": "class",
+          "product_url": "https://www2.hm.com/en_us/search-results.html?q=pleated%20skirt",
+          "brand": "H&M"
+        },
+        "shoes": {
+          "item_name": "White Sneakers",
+          "category": "shoes",
+          "formality": "casual",
+          "season": "all",
+          "color": "white",
+          "style": "minimal",
+          "occasion": "class",
+          "product_url": "https://www.veja-store.com/en_us/search?q=white+sneakers",
+          "brand": "Veja"
+        }
+      },
+      "explanation": "This outfit fits a casual dress code for class and matches your selected weather, style, and color preferences."
+    }
+  },
+  {
+    "name": "Graphic Tee + Cargos",
+    "folder": "Weekend",
+    "filters": {
+      "dress_code": "streetwear",
+      "occasion": "class",
+      "weather": "warm",
+      "style": "any",
+      "color": "any",
+      "vibe": "effortless"
+    },
+    "outfit": {
+      "success": true,
+      "items": {
+        "top": {
+          "item_name": "Graphic Tee",
+          "category": "top",
+          "formality": "streetwear",
+          "season": "warm",
+          "color": "white",
+          "style": "edgy",
+          "occasion": "class",
+          "product_url": "https://www.urbanoutfitters.com/search?q=graphic+tee",
+          "brand": "Urban Outfitters"
+        },
+        "bottom": {
+          "item_name": "Baggy Cargo Pants",
+          "category": "bottom",
+          "formality": "streetwear",
+          "season": "all",
+          "color": "gray",
+          "style": "edgy",
+          "occasion": "class",
+          "product_url": "https://www.pacsun.com/search?q=baggy%20cargo%20pants",
+          "brand": "PacSun"
+        },
+        "shoes": {
+          "item_name": "Chunky Sneakers",
+          "category": "shoes",
+          "formality": "streetwear",
+          "season": "all",
+          "color": "white",
+          "style": "trendy",
+          "occasion": "class",
+          "product_url": "https://www.nike.com/w?q=chunky+sneakers",
+          "brand": "Nike"
+        }
+      },
+      "explanation": "This outfit fits a streetwear dress code for class and matches your selected weather, style, and color preferences."
+    }
+  },
+  {
+    "name": "Minimal Work Look",
+    "folder": "Work",
+    "filters": {
+      "dress_code": "business_formal",
+      "occasion": "office",
+      "weather": "cold",
+      "style": "any",
+      "color": "any",
+      "vibe": "polished"
+    },
+    "outfit": {
+      "success": true,
+      "items": {
+        "main_piece": {
+          "item_name": "Cream Sweater Dress",
+          "category": "one_piece",
+          "formality": "smart_casual",
+          "season": "cold",
+          "color": "cream",
+          "style": "minimal",
+          "occasion": "dinner",
+          "product_url": "https://www.aritzia.com/us/en/search?q=sweater+dress",
+          "brand": "Aritzia",
+          "score": 5,
+          "reasons": [
+            "seasonal fit"
+          ]
+        },
+        "shoes": {
+          "item_name": "Taupe Pumps",
+          "category": "shoes",
+          "formality": "business_formal",
+          "season": "all",
+          "color": "taupe",
+          "style": "elegant",
+          "occasion": "office",
+          "product_url": "https://www.stevemadden.com/search?q=pumps",
+          "brand": "Steve Madden",
+          "score": 13,
+          "reasons": [
+            "exact dress code match",
+            "occasion match",
+            "all-season piece"
+          ]
+        },
+        "outerwear": {
+          "item_name": "Black Blazer",
+          "category": "outerwear",
+          "formality": "business_formal",
+          "season": "all",
+          "color": "black",
+          "style": "classic",
+          "occasion": "office",
+          "product_url": "https://www.zara.com/us/en/woman-blazers-l1055.html",
+          "brand": "Zara",
+          "score": 13,
+          "reasons": [
+            "exact dress code match",
+            "occasion match",
+            "all-season piece"
+          ]
+        }
+      },
+      "explanation": "This outfit is built for a business formal look with a focus on office. It also takes cold weather into account. Selected pieces: Cream Sweater Dress, Taupe Pumps, Black Blazer.",
+      "badges": [
+        "strong dress code fit",
+        "occasion-ready",
+        "weather-aware"
+      ]
+    }
+  },
+  {
+    "name": "Formal work look",
+    "folder": "Work",
+    "filters": {
+      "dress_code": "business_formal",
+      "occasion": "class",
+      "weather": "warm",
+      "style": "minimal",
+      "color": "any",
+      "vibe": "polished"
+    },
+    "outfit": {
+      "success": true,
+      "items": {
+        "main_piece": {
+          "item_name": "Emerald Satin Dress",
+          "category": "one_piece",
+          "formality": "formal",
+          "season": "all",
+          "color": "emerald",
+          "style": "elegant",
+          "occasion": "wedding",
+          "product_url": "https://www.calvinklein.us/en/search?q=satin+dress",
+          "brand": "Calvin Klein",
+          "score": 6,
+          "reasons": [
+            "compatible dress code",
+            "all-season piece"
+          ]
+        },
+        "shoes": {
+          "item_name": "Espresso Loafers",
+          "category": "shoes",
+          "formality": "business_formal",
+          "season": "all",
+          "color": "espresso",
+          "style": "classic",
+          "occasion": "office",
+          "product_url": "https://www.samedelman.com/search?q=loafers",
+          "brand": "Sam Edelman",
+          "score": 8,
+          "reasons": [
+            "exact dress code match",
+            "all-season piece"
+          ]
+        },
+        "outerwear": {
+          "item_name": "Black Blazer",
+          "category": "outerwear",
+          "formality": "business_formal",
+          "season": "all",
+          "color": "black",
+          "style": "classic",
+          "occasion": "office",
+          "product_url": "https://www.zara.com/us/en/woman-blazers-l1055.html",
+          "brand": "Zara",
+          "score": 8,
+          "reasons": [
+            "exact dress code match",
+            "all-season piece"
+          ]
+        }
+      },
+      "explanation": "This outfit is built for a business formal look with a focus on class. It also takes warm weather into account. The pieces lean minimal in style. Selected pieces: Emerald Satin Dress, Espresso Loafers, Black Blazer.",
+      "badges": [
+        "strong dress code fit",
+        "weather-aware"
+      ]
+    }
+  }
+]
