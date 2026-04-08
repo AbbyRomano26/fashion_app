@@ -13,48 +13,28 @@ SAVE_FILE = "saved_outfits.json"
 
 COLOR_OPTIONS = [
     "any",
-    "black",
-    "white",
-    "gray",
-    "charcoal",
-    "silver",
-    "cream",
-    "beige",
-    "tan",
-    "camel",
-    "brown",
-    "espresso",
-    "taupe",
-    "navy",
-    "blue",
-    "light blue",
-    "denim",
-    "teal",
-    "green",
-    "olive",
-    "sage",
-    "mint",
-    "emerald",
-    "yellow",
+
+    # Rainbow
+    "red", "orange", "yellow", "green", "blue", "purple",
+
+    # Variations
+    "pink", "blush", "hot pink",
+    "coral", "peach",
     "mustard",
+    "mint", "sage", "olive", "emerald",
+    "teal",
+    "light blue", "navy", "denim",
+    "lavender", "lilac", "violet", "plum",
+    "burgundy", "maroon",
+
+    # Neutrals
+    "black", "white", "gray", "charcoal", "silver",
+    "cream", "beige", "tan", "camel", "taupe",
+    "brown", "espresso",
+
+    # Other
     "gold",
-    "orange",
-    "peach",
-    "coral",
-    "red",
-    "burgundy",
-    "maroon",
-    "pink",
-    "blush",
-    "hot pink",
-    "purple",
-    "lavender",
-    "lilac",
-    "violet",
-    "plum",
-    "multicolor",
-    "print",
-    "custom"
+    "multicolor", "print", "custom"
 ]
 
 DEFAULT_FILTERS = {
@@ -87,6 +67,16 @@ if "action_message" not in st.session_state:
     st.session_state.action_message = ""
 if "do_reset_filters" not in st.session_state:
     st.session_state.do_reset_filters = False
+
+
+def clean_text(value, fallback="", title_case=True):
+    if value is None:
+        return fallback
+    text = str(value).strip()
+    if text == "":
+        return fallback
+    text = text.replace("_", " ")
+    return text.title() if title_case else text
 
 
 def load_saved_outfits():
@@ -155,24 +145,46 @@ with st.form("outfit_form"):
         dress_code = st.selectbox(
             "Dress code",
             ["casual", "smart_casual", "business_casual", "business_formal", "formal", "cocktail", "streetwear", "date_night"],
-            key="filter_dress_code"
+            key="filter_dress_code",
+            format_func=lambda x: clean_text(x)
         )
         occasion = st.selectbox(
             "Occasion",
             ["class", "office", "dinner", "wedding", "brunch", "party", "date"],
-            key="filter_occasion"
+            key="filter_occasion",
+            format_func=lambda x: clean_text(x)
         )
 
     with col2:
-        weather = st.selectbox("Weather", ["warm", "cold", "all"], key="filter_weather")
-        style = st.selectbox("Preferred style", ["any", "classic", "minimal", "casual", "elegant", "edgy", "trendy"], key="filter_style")
+        weather = st.selectbox(
+            "Weather",
+            ["warm", "cold", "all"],
+            key="filter_weather",
+            format_func=lambda x: clean_text(x)
+        )
+        style = st.selectbox(
+            "Preferred style",
+            ["any", "classic", "minimal", "casual", "elegant", "edgy", "trendy"],
+            key="filter_style",
+            format_func=lambda x: clean_text(x)
+        )
 
     with col3:
-        color = st.selectbox("Preferred color", COLOR_OPTIONS, key="filter_color")
+        color = st.selectbox(
+            "Preferred color",
+            COLOR_OPTIONS,
+            key="filter_color",
+            format_func=lambda x: clean_text(x)
+        )
         custom_color = ""
         if color == "custom":
             custom_color = st.text_input("Custom color", placeholder="Ex: taupe")
-        vibe = st.selectbox("Vibe", ["polished", "effortless", "chic", "cool", "romantic", "modern"], key="filter_vibe")
+        vibe = st.selectbox(
+            "Vibe",
+            ["polished", "effortless", "chic", "cool", "romantic", "modern"],
+            key="filter_vibe",
+            format_func=lambda x: clean_text(x)
+        )
 
     btn1, btn2, btn3 = st.columns([2, 2, 6])
     with btn1:
@@ -204,15 +216,15 @@ def display_item_card(category, item):
             margin-bottom:1rem;
         ">
             <div style="font-size:0.86rem;font-weight:700;text-transform:uppercase;color:#b06a8d;margin-bottom:0.5rem;">
-                {category.replace('_', ' ')}
+                {clean_text(category)}
             </div>
             <div style="font-size:1.08rem;font-weight:800;color:#1f2230;margin-bottom:0.5rem;">
-                {item['item_name']}
+                {clean_text(item.get('item_name', 'Unnamed Item'))}
             </div>
             <div style="color:#6d7283;font-size:0.94rem;">Brand: {item.get('brand', 'Unknown')}</div>
-            <div style="color:#6d7283;font-size:0.94rem;">Color: {str(item.get('color', 'Unknown')).title()}</div>
-            <div style="color:#6d7283;font-size:0.94rem;">Style: {str(item.get('style', 'Unknown')).title()}</div>
-            <div style="color:#6d7283;font-size:0.94rem;">Occasion: {str(item.get('occasion', 'Unknown')).title()}</div>
+            <div style="color:#6d7283;font-size:0.94rem;">Color: {clean_text(item.get('color', 'Unknown'))}</div>
+            <div style="color:#6d7283;font-size:0.94rem;">Style: {clean_text(item.get('style', 'Unknown'))}</div>
+            <div style="color:#6d7283;font-size:0.94rem;">Occasion: {clean_text(item.get('occasion', 'Unknown'))}</div>
             <a href="{item['product_url']}" target="_blank" style="
                 display:inline-block;
                 margin-top:0.9rem;
@@ -248,7 +260,7 @@ if st.session_state.current_outfit and st.session_state.current_outfit["success"
             margin-bottom:0.45rem;
             font-weight:700;
             font-size:0.9rem;
-        ">{badge}</span>
+        ">{clean_text(badge)}</span>
         """
     st.markdown(badge_html, unsafe_allow_html=True)
 
@@ -261,7 +273,7 @@ if st.session_state.current_outfit and st.session_state.current_outfit["success"
                 with col:
                     display_item_card(category, item)
 
-    st.info(result["explanation"])
+    st.info(clean_text(result["explanation"], title_case=False))
 
     action_col1, action_col2, action_col3 = st.columns([1, 1, 4])
 
@@ -279,7 +291,7 @@ if st.session_state.current_outfit and st.session_state.current_outfit["success"
 
         existing_outfits = load_saved_outfits()
         existing_folders = sorted(
-            {o.get("folder", "Uncategorized") for o in existing_outfits if o.get("folder")}
+            {clean_text(o.get("folder", "Uncategorized")) for o in existing_outfits if o.get("folder")}
         )
 
         folder_choices = existing_folders + ["Work", "Weekend", "Going Out", "Date Night", "Events", "Favorites"]
@@ -302,8 +314,8 @@ if st.session_state.current_outfit and st.session_state.current_outfit["success"
             save_submit = st.form_submit_button("Confirm Save")
 
         if save_submit:
-            final_folder = custom_folder.strip() if folder == "Custom" else folder
-            final_name = outfit_name.strip() if outfit_name.strip() else "Untitled Outfit"
+            final_folder = custom_folder.strip().replace("_", " ") if folder == "Custom" else folder
+            final_name = outfit_name.strip().replace("_", " ") if outfit_name.strip() else "Untitled Outfit"
 
             save_entry = {
                 "name": final_name,

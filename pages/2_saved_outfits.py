@@ -14,6 +14,16 @@ if "saved_page_message" not in st.session_state:
     st.session_state.saved_page_message = ""
 
 
+def clean_text(value, fallback="", title_case=True):
+    if value is None:
+        return fallback
+    text = str(value).strip()
+    if text == "":
+        return fallback
+    text = text.replace("_", " ")
+    return text.title() if title_case else text
+
+
 def load_saved_outfits():
     if os.path.exists(SAVE_FILE):
         with open(SAVE_FILE, "r", encoding="utf-8") as f:
@@ -29,7 +39,7 @@ def save_all_outfits(outfits):
 def delete_outfit_by_index(index):
     outfits = load_saved_outfits()
     if 0 <= index < len(outfits):
-        deleted_name = outfits[index].get("name", "Outfit")
+        deleted_name = clean_text(outfits[index].get("name", "Outfit"))
         outfits.pop(index)
         save_all_outfits(outfits)
         st.session_state.saved_page_message = f'"{deleted_name}" was deleted.'
@@ -39,9 +49,9 @@ def update_outfit(index, new_name=None, new_folder=None):
     outfits = load_saved_outfits()
     if 0 <= index < len(outfits):
         if new_name is not None:
-            outfits[index]["name"] = new_name
+            outfits[index]["name"] = new_name.replace("_", " ")
         if new_folder is not None:
-            outfits[index]["folder"] = new_folder
+            outfits[index]["folder"] = new_folder.replace("_", " ")
         save_all_outfits(outfits)
         st.session_state.saved_page_message = "Outfit updated."
 
@@ -219,7 +229,7 @@ else:
     st.markdown('<div class="section-title">Your Closet of Looks</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtle-text">Filter by folder and manage each saved outfit below.</div>', unsafe_allow_html=True)
 
-    all_folders = sorted({outfit.get("folder", "Uncategorized") for outfit in saved_outfits})
+    all_folders = sorted({clean_text(outfit.get("folder", "Uncategorized")) for outfit in saved_outfits})
 
     filter_col1, filter_col2 = st.columns([2, 5])
 
@@ -235,7 +245,7 @@ else:
     else:
         display_indices = [
             i for i, outfit in enumerate(saved_outfits)
-            if outfit.get("folder", "Uncategorized") == selected_folder
+            if clean_text(outfit.get("folder", "Uncategorized")) == selected_folder
         ]
 
     if not display_indices:
@@ -261,43 +271,45 @@ else:
                 idx = display_indices[row_start + col_offset]
                 outfit = saved_outfits[idx]
                 pieces = outfit["outfit"]["items"]
-                piece_names = [piece["item_name"] for piece in pieces.values()]
+                piece_names = [clean_text(piece.get("item_name", "Unnamed Item")) for piece in pieces.values()]
                 filters = outfit.get("filters", {})
 
                 with col:
                     st.markdown(
                         f"""
                         <div class="saved-card">
-                            <div class="folder-label">{outfit.get("folder", "Uncategorized")}</div>
-                            <div class="saved-title">{outfit.get("name", "Untitled Outfit")}</div>
-                            <div class="saved-meta"><strong>Dress code:</strong> {filters.get("dress_code", "").replace("_", " ").title()}</div>
-                            <div class="saved-meta"><strong>Occasion:</strong> {filters.get("occasion", "").title()}</div>
-                            <div class="saved-meta"><strong>Style:</strong> {filters.get("style", "").title()}</div>
-                            <div class="saved-meta"><strong>Color:</strong> {filters.get("color", "").title()}</div>
-                            <div class="saved-meta"><strong>Vibe:</strong> {filters.get("vibe", "").title()}</div>
+                            <div class="folder-label">{clean_text(outfit.get("folder", "Uncategorized"))}</div>
+                            <div class="saved-title">{clean_text(outfit.get("name", "Untitled Outfit"))}</div>
+                            <div class="saved-meta"><strong>Dress code:</strong> {clean_text(filters.get("dress_code", ""))}</div>
+                            <div class="saved-meta"><strong>Occasion:</strong> {clean_text(filters.get("occasion", ""))}</div>
+                            <div class="saved-meta"><strong>Style:</strong> {clean_text(filters.get("style", ""))}</div>
+                            <div class="saved-meta"><strong>Color:</strong> {clean_text(filters.get("color", ""))}</div>
+                            <div class="saved-meta"><strong>Vibe:</strong> {clean_text(filters.get("vibe", ""))}</div>
                             <div class="saved-meta"><strong>Pieces:</strong> {", ".join(piece_names)}</div>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
 
-                    with st.expander(f'View shopping links: {outfit.get("name", "Untitled Outfit")}'):
+                    with st.expander(f'View shopping links: {clean_text(outfit.get("name", "Untitled Outfit"))}'):
                         for category, piece in pieces.items():
-                            st.markdown(f'**{category.replace("_", " ").title()}**: {piece["item_name"]}')
+                            st.markdown(
+                                f'**{clean_text(category)}**: {clean_text(piece.get("item_name", "Unnamed Item"))}'
+                            )
                             st.markdown(f'[Shop Similar]({piece["product_url"]})')
 
-                    with st.expander(f'Edit: {outfit.get("name", "Untitled Outfit")}'):
+                    with st.expander(f'Edit: {clean_text(outfit.get("name", "Untitled Outfit"))}'):
                         with st.form(f"edit_form_{idx}"):
                             new_name = st.text_input(
                                 "Rename outfit",
-                                value=outfit.get("name", "Untitled Outfit")
+                                value=clean_text(outfit.get("name", "Untitled Outfit"), title_case=False)
                             )
 
                             folder_options = all_folders.copy()
                             if "Custom" not in folder_options:
                                 folder_options.append("Custom")
 
-                            current_folder = outfit.get("folder", "Uncategorized")
+                            current_folder = clean_text(outfit.get("folder", "Uncategorized"))
                             if current_folder not in folder_options:
                                 folder_options.insert(0, current_folder)
 
@@ -319,11 +331,14 @@ else:
 
                             update_outfit(
                                 idx,
-                                new_name=new_name.strip() if new_name.strip() else "Untitled Outfit",
-                                new_folder=final_folder
+                                new_name=new_name.strip().replace("_", " ") if new_name.strip() else "Untitled Outfit",
+                                new_folder=final_folder.replace("_", " ")
                             )
                             st.rerun()
 
-                    if st.button(f'Delete "{outfit.get("name", "Untitled Outfit")}"', key=f"delete_{idx}"):
+                    if st.button(
+                        f'Delete "{clean_text(outfit.get("name", "Untitled Outfit"))}"',
+                        key=f"delete_{idx}"
+                    ):
                         delete_outfit_by_index(idx)
                         st.rerun()

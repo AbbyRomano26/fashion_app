@@ -53,6 +53,11 @@ if "home_open_sections" not in st.session_state:
     }
 
 
+def clean_text(value, title_case=True):
+    text = str(value).replace("_", " ")
+    return text.title() if title_case else text
+
+
 def load_closet_items():
     if os.path.exists(CLOSET_FILE):
         with open(CLOSET_FILE, "r", encoding="utf-8") as f:
@@ -91,12 +96,12 @@ def render_piece_card(category, item):
     st.markdown(
         f"""
         <div class="piece-card">
-            <div class="piece-label">{category.replace('_', ' ').title()}</div>
-            <div class="piece-name">{item["item_name"]}</div>
+            <div class="piece-label">{clean_text(category)}</div>
+            <div class="piece-name">{clean_text(item.get("item_name", "Unnamed Item"))}</div>
             <div class="piece-meta">Brand: {item.get("brand", "Unknown")}</div>
-            <div class="piece-meta">Color: {str(item.get("color", "Unknown")).title()}</div>
-            <div class="piece-meta">Style: {str(item.get("style", "Unknown")).title()}</div>
-            <div class="piece-meta">Occasion: {str(item.get("occasion", "Unknown")).title()}</div>
+            <div class="piece-meta">Color: {clean_text(item.get("color", "Unknown"))}</div>
+            <div class="piece-meta">Style: {clean_text(item.get("style", "Unknown"))}</div>
+            <div class="piece-meta">Occasion: {clean_text(item.get("occasion", "Unknown"))}</div>
             <a href="{item["product_url"]}" target="_blank" class="shop-link">Browse Similar</a>
         </div>
         """,
@@ -109,7 +114,7 @@ def render_badges(badges):
         return
     badge_html = ""
     for badge in badges:
-        badge_html += f'<span class="pill">{badge}</span>'
+        badge_html += f'<span class="pill">{clean_text(badge)}</span>'
     st.markdown(badge_html, unsafe_allow_html=True)
 
 
@@ -129,7 +134,7 @@ def render_outfit_summary(result):
         f"""
         <div class="summary-box">
             <div class="summary-title">Why this works</div>
-            <div class="summary-text">{result["explanation"]}</div>
+            <div class="summary-text">{clean_text(result["explanation"], title_case=False)}</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -161,9 +166,9 @@ def render_closet_preview_items(closet_items):
         st.markdown(
             f"""
             <div class="closet-mini-card">
-                <div class="closet-mini-name">{item.get("item_name", "Unnamed Item")}</div>
+                <div class="closet-mini-name">{clean_text(item.get("item_name", "Unnamed Item"))}</div>
                 <div class="closet-mini-meta">
-                    {str(item.get("category", "item")).replace("_", " ").title()} • {item.get("brand", "Unknown")}
+                    {clean_text(item.get("category", "item"))} • {item.get("brand", "Unknown")}
                 </div>
             </div>
             """,
@@ -473,7 +478,10 @@ with top_col1:
 
     if today_result["success"]:
         for piece in today_result["items"].values():
-            st.markdown(f'<span class="pill">{piece["item_name"]}</span>', unsafe_allow_html=True)
+            st.markdown(
+                f'<span class="pill">{clean_text(piece.get("item_name", "Unnamed Item"))}</span>',
+                unsafe_allow_html=True
+            )
     else:
         st.markdown('<div class="empty-note">No strong suggestion available yet.</div>', unsafe_allow_html=True)
 
@@ -521,9 +529,9 @@ for i, look in enumerate(RECOMMENDED_LOOKS):
                 <div>
                     <div class="look-title">{look["title"]}</div>
                     <div class="look-subtitle">{look["subtitle"]}</div>
-                    <span class="look-tag">{look["dress_code"].replace("_", " ").title()}</span>
-                    <span class="look-tag">{look["occasion"].title()}</span>
-                    <span class="look-tag">{look["style"].title()}</span>
+                    <span class="look-tag">{clean_text(look["dress_code"])}</span>
+                    <span class="look-tag">{clean_text(look["occasion"])}</span>
+                    <span class="look-tag">{clean_text(look["style"])}</span>
                 </div>
             """,
             unsafe_allow_html=True

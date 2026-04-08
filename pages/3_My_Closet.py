@@ -12,15 +12,27 @@ CLOSET_FILE = "closet_items.json"
 
 COLOR_OPTIONS = [
     "not specified",
-    "black", "white", "gray", "charcoal", "silver",
-    "cream", "beige", "tan", "camel", "brown", "espresso", "taupe",
-    "navy", "blue", "light blue", "denim", "teal",
-    "green", "olive", "sage", "mint", "emerald",
-    "yellow", "mustard", "gold",
-    "orange", "peach", "coral",
-    "red", "burgundy", "maroon",
+
+    # 🌈 Rainbow
+    "red", "orange", "yellow", "green", "blue", "purple",
+
+    # 🌸 Variations
     "pink", "blush", "hot pink",
-    "purple", "lavender", "lilac", "violet", "plum",
+    "coral", "peach",
+    "mustard",
+    "mint", "sage", "olive", "emerald",
+    "teal",
+    "light blue", "navy", "denim",
+    "lavender", "lilac", "violet", "plum",
+    "burgundy", "maroon",
+
+    # ⚫ Neutrals
+    "black", "white", "gray", "charcoal", "silver",
+    "cream", "beige", "tan", "camel", "taupe",
+    "brown", "espresso",
+
+    # ✨ Other
+    "gold",
     "multicolor", "print", "custom"
 ]
 
@@ -59,6 +71,16 @@ if "closet_message" not in st.session_state:
     st.session_state.closet_message = ""
 
 
+def clean_text(value, fallback="Not specified", title_case=True):
+    if value is None:
+        return fallback
+    text = str(value).strip()
+    if text == "" or text.lower() == "not specified":
+        return fallback
+    text = text.replace("_", " ")
+    return text.title() if title_case else text
+
+
 def load_closet_items():
     if os.path.exists(CLOSET_FILE):
         with open(CLOSET_FILE, "r", encoding="utf-8") as f:
@@ -69,15 +91,6 @@ def load_closet_items():
 def save_closet_items(items):
     with open(CLOSET_FILE, "w", encoding="utf-8") as f:
         json.dump(items, f, indent=2)
-
-
-def display_value(value, fallback="Not specified"):
-    if value is None:
-        return fallback
-    text = str(value).strip()
-    if text == "" or text.lower() == "not specified":
-        return fallback
-    return text.replace("_", " ").title()
 
 
 closet_items = load_closet_items()
@@ -94,22 +107,47 @@ with st.form("add_closet_item"):
 
     with c1:
         item_name = st.text_input("Item name", placeholder="White Button Down")
-        category = st.selectbox("Category", CATEGORY_OPTIONS)
+        category = st.selectbox(
+            "Category",
+            CATEGORY_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
 
     with c2:
-        color = st.selectbox("Color", COLOR_OPTIONS)
+        color = st.selectbox(
+            "Color",
+            COLOR_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
         custom_color = ""
         if color == "custom":
             custom_color = st.text_input("Custom color", placeholder="Ex: taupe")
-        style = st.selectbox("Style", STYLE_OPTIONS)
+
+        style = st.selectbox(
+            "Style",
+            STYLE_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
 
     with c3:
         brand = st.text_input("Brand", placeholder="Everlane")
-        season = st.selectbox("Season", SEASON_OPTIONS)
+        season = st.selectbox(
+            "Season",
+            SEASON_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
 
     with c4:
-        formality = st.selectbox("Dress code", FORMALITY_OPTIONS)
-        occasion = st.selectbox("Occasion", OCCASION_OPTIONS)
+        formality = st.selectbox(
+            "Dress code",
+            FORMALITY_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
+        occasion = st.selectbox(
+            "Occasion",
+            OCCASION_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
 
     add_item = st.form_submit_button("Add to Closet")
 
@@ -119,24 +157,19 @@ if add_item and item_name.strip():
     else:
         final_color = color.lower()
 
-    final_style = style.lower()
-    final_season = season.lower()
-    final_formality = formality.lower()
-    final_occasion = occasion.lower()
-
     closet_items.append({
-        "item_name": item_name.strip(),
+        "item_name": item_name.strip().replace("_", " "),
         "category": category,
         "color": final_color,
-        "style": final_style,
+        "style": style.lower(),
         "brand": brand.strip() if brand.strip() else "Unknown",
-        "season": final_season,
-        "formality": final_formality,
-        "occasion": final_occasion
+        "season": season.lower(),
+        "formality": formality.lower(),
+        "occasion": occasion.lower()
     })
 
     save_closet_items(closet_items)
-    st.session_state.closet_message = f'"{item_name.strip()}" added to closet.'
+    st.session_state.closet_message = f'"{item_name.strip().replace("_", " ")}" added to closet.'
     st.rerun()
 
 if not closet_items:
@@ -167,21 +200,24 @@ else:
                         margin-bottom:1rem;
                     ">
                         <div style="font-size:1.05rem;font-weight:800;color:#1f2230;margin-bottom:0.35rem;">
-                            {item.get('item_name', 'Unnamed Item')}
+                            {clean_text(item.get('item_name', 'Unnamed Item'))}
                         </div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Category: {display_value(item.get('category'), 'Unknown')}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Color: {display_value(item.get('color'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Style: {display_value(item.get('style'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Category: {clean_text(item.get('category'), 'Unknown')}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Color: {clean_text(item.get('color'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Style: {clean_text(item.get('style'))}</div>
                         <div style="color:#6d7283;font-size:0.94rem;">Brand: {item.get('brand', 'Unknown')}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Season: {display_value(item.get('season'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Dress code: {display_value(item.get('formality'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Occasion: {display_value(item.get('occasion'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Season: {clean_text(item.get('season'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Dress code: {clean_text(item.get('formality'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Occasion: {clean_text(item.get('occasion'))}</div>
                     </div>
                     """,
                     unsafe_allow_html=True
                 )
 
-                if st.button(f'Delete {item.get("item_name", "Item")}', key=f"delete_closet_{idx}"):
+                if st.button(
+                    f'Delete {clean_text(item.get("item_name", "Item"))}',
+                    key=f"delete_closet_{idx}"
+                ):
                     closet_items.pop(idx)
                     save_closet_items(closet_items)
                     st.session_state.closet_message = "Closet item removed."
