@@ -7,7 +7,8 @@
     "brand": "Banana Republic",
     "season": "all",
     "formality": "business_casual",
-    "occasion": "class"
+    "occasion": "class",
+    "image_url": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80"
   },
   {
     "item_name": "Green Striped Sweater",
@@ -17,7 +18,8 @@
     "brand": "J. Crew",
     "season": "cold",
     "formality": "casual",
-    "occasion": "class"
+    "occasion": "class",
+    "image_url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80"
   },
   {
     "item_name": "Fluffy Cardigan",
@@ -27,7 +29,8 @@
     "brand": "Unknown",
     "season": "cold",
     "formality": "business_casual",
-    "occasion": "office"
+    "occasion": "office",
+    "image_url": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=80"
   },
   {
     "item_name": "Suede and Fur Coat",
@@ -37,7 +40,8 @@
     "brand": "Unknown",
     "season": "cold",
     "formality": "not specified",
-    "occasion": "not specified"
+    "occasion": "not specified",
+    "image_url": "https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=400&q=80"
   },
   {
     "item_name": "Straight Leg Jeans",
@@ -47,7 +51,8 @@
     "brand": "Levis",
     "season": "all",
     "formality": "not specified",
-    "occasion": "not specified"
+    "occasion": "not specified",
+    "image_url": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"
   },
   {
     "item_name": "Red Samba Sneakers",
@@ -57,7 +62,8 @@
     "brand": "Adidas",
     "season": "all",
     "formality": "not specified",
-    "occasion": "not specified"
+    "occasion": "not specified",
+    "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"
   },
   {
     "item_name": "Red Sox Hat",
@@ -67,6 +73,7 @@
     "brand": "Unknown",
     "season": "all",
     "formality": "not specified",
-    "occasion": "not specified"
+    "occasion": "not specified",
+    "image_url": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80"
   }
 ]
