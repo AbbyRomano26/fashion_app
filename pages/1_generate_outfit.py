@@ -11,13 +11,11 @@ st.set_page_config(
 
 SAVE_FILE = "saved_outfits.json"
 
+DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80"
+
 COLOR_OPTIONS = [
     "any",
-
-    # Rainbow
     "red", "orange", "yellow", "green", "blue", "purple",
-
-    # Variations
     "pink", "blush", "hot pink",
     "coral", "peach",
     "mustard",
@@ -26,13 +24,9 @@ COLOR_OPTIONS = [
     "light blue", "navy", "denim",
     "lavender", "lilac", "violet", "plum",
     "burgundy", "maroon",
-
-    # Neutrals
     "black", "white", "gray", "charcoal", "silver",
     "cream", "beige", "tan", "camel", "taupe",
     "brown", "espresso",
-
-    # Other
     "gold",
     "multicolor", "print", "custom"
 ]
@@ -77,6 +71,13 @@ def clean_text(value, fallback="", title_case=True):
         return fallback
     text = text.replace("_", " ")
     return text.title() if title_case else text
+
+
+def get_image_url(item):
+    image_url = str(item.get("image_url", "")).strip()
+    if not image_url or image_url.lower() in ["not specified", "none", "nan", ""]:
+        return DEFAULT_IMAGE_URL
+    return image_url
 
 
 def load_saved_outfits():
@@ -204,6 +205,23 @@ if submitted:
 
 
 def display_item_card(category, item):
+    image_url = get_image_url(item)
+    product_url = item.get("product_url", "")
+    shop_link_html = ""
+    if product_url:
+        shop_link_html = f"""
+        <a href="{product_url}" target="_blank" style="
+            display:inline-block;
+            margin-top:0.9rem;
+            padding:0.62rem 1rem;
+            border-radius:10px;
+            background:#f7e5ee;
+            color:#4a2f3d;
+            text-decoration:none;
+            font-weight:700;
+        ">Shop Similar</a>
+        """
+
     st.markdown(
         f"""
         <div style="
@@ -211,10 +229,17 @@ def display_item_card(category, item):
             border:1px solid #e8e3eb;
             border-radius:22px;
             padding:1rem;
-            min-height:210px;
             box-shadow:0 8px 20px rgba(40,36,48,0.04);
             margin-bottom:1rem;
         ">
+            <img src="{image_url}" style="
+                width:100%;
+                height:220px;
+                object-fit:cover;
+                border-radius:14px;
+                margin-bottom:0.75rem;
+                display:block;
+            " />
             <div style="font-size:0.86rem;font-weight:700;text-transform:uppercase;color:#b06a8d;margin-bottom:0.5rem;">
                 {clean_text(category)}
             </div>
@@ -225,16 +250,7 @@ def display_item_card(category, item):
             <div style="color:#6d7283;font-size:0.94rem;">Color: {clean_text(item.get('color', 'Unknown'))}</div>
             <div style="color:#6d7283;font-size:0.94rem;">Style: {clean_text(item.get('style', 'Unknown'))}</div>
             <div style="color:#6d7283;font-size:0.94rem;">Occasion: {clean_text(item.get('occasion', 'Unknown'))}</div>
-            <a href="{item['product_url']}" target="_blank" style="
-                display:inline-block;
-                margin-top:0.9rem;
-                padding:0.62rem 1rem;
-                border-radius:10px;
-                background:#f7e5ee;
-                color:#4a2f3d;
-                text-decoration:none;
-                font-weight:700;
-            ">Shop Similar</a>
+            {shop_link_html}
         </div>
         """,
         unsafe_allow_html=True
