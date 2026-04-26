@@ -10,13 +10,11 @@ st.set_page_config(
 
 CLOSET_FILE = "closet_items.json"
 
+DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&q=80"
+
 COLOR_OPTIONS = [
     "not specified",
-
-    # 🌈 Rainbow
     "red", "orange", "yellow", "green", "blue", "purple",
-
-    # 🌸 Variations
     "pink", "blush", "hot pink",
     "coral", "peach",
     "mustard",
@@ -25,13 +23,9 @@ COLOR_OPTIONS = [
     "light blue", "navy", "denim",
     "lavender", "lilac", "violet", "plum",
     "burgundy", "maroon",
-
-    # ⚫ Neutrals
     "black", "white", "gray", "charcoal", "silver",
     "cream", "beige", "tan", "camel", "taupe",
     "brown", "espresso",
-
-    # ✨ Other
     "gold",
     "multicolor", "print", "custom"
 ]
@@ -81,6 +75,13 @@ def clean_text(value, fallback="Not specified", title_case=True):
     return text.title() if title_case else text
 
 
+def get_image_url(item):
+    image_url = str(item.get("image_url", "")).strip()
+    if not image_url or image_url.lower() in ["not specified", "none", "nan", ""]:
+        return DEFAULT_IMAGE_URL
+    return image_url
+
+
 def load_closet_items():
     if os.path.exists(CLOSET_FILE):
         with open(CLOSET_FILE, "r", encoding="utf-8") as f:
@@ -96,7 +97,7 @@ def save_closet_items(items):
 closet_items = load_closet_items()
 
 st.markdown("## My Closet")
-st.caption("Add pieces you already own. Optional fields can be left unspecified.")
+st.caption("Add pieces you already own. Paste an image URL to see your item's photo.")
 
 if st.session_state.closet_message:
     st.toast(st.session_state.closet_message)
@@ -149,6 +150,11 @@ with st.form("add_closet_item"):
             format_func=lambda x: clean_text(x)
         )
 
+    image_url_input = st.text_input(
+        "Image URL (optional)",
+        placeholder="Paste a direct image link, e.g. https://images.unsplash.com/..."
+    )
+
     add_item = st.form_submit_button("Add to Closet")
 
 if add_item and item_name.strip():
@@ -165,7 +171,8 @@ if add_item and item_name.strip():
         "brand": brand.strip() if brand.strip() else "Unknown",
         "season": season.lower(),
         "formality": formality.lower(),
-        "occasion": occasion.lower()
+        "occasion": occasion.lower(),
+        "image_url": image_url_input.strip() if image_url_input.strip() else ""
     })
 
     save_closet_items(closet_items)
@@ -186,6 +193,7 @@ else:
 
             idx = row_start + offset
             item = closet_items[idx]
+            img_url = get_image_url(item)
 
             with col:
                 st.markdown(
@@ -195,10 +203,16 @@ else:
                         border:1px solid #e8e3eb;
                         border-radius:22px;
                         padding:1rem;
-                        min-height:220px;
                         box-shadow:0 8px 20px rgba(40,36,48,0.04);
                         margin-bottom:1rem;
                     ">
+                        <img src="{img_url}" style="
+                            width:100%;
+                            height:220px;
+                            object-fit:cover;
+                            border-radius:14px;
+                            margin-bottom:0.75rem;
+                        " />
                         <div style="font-size:1.05rem;font-weight:800;color:#1f2230;margin-bottom:0.35rem;">
                             {clean_text(item.get('item_name', 'Unnamed Item'))}
                         </div>
