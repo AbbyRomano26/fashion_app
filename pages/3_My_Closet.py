@@ -12,38 +12,23 @@ CLOSET_FILE = "closet_items.json"
 
 COLOR_OPTIONS = [
     "not specified",
-
-    # 🌈 Rainbow
     "red", "orange", "yellow", "green", "blue", "purple",
-
-    # 🌸 Variations
-    "pink", "blush", "hot pink",
-    "coral", "peach",
-    "mustard",
-    "mint", "sage", "olive", "emerald",
-    "teal",
+    "pink", "blush", "hot pink", "coral", "peach", "mustard",
+    "mint", "sage", "olive", "emerald", "teal",
     "light blue", "navy", "denim",
     "lavender", "lilac", "violet", "plum",
     "burgundy", "maroon",
-
-    # ⚫ Neutrals
     "black", "white", "gray", "charcoal", "silver",
     "cream", "beige", "tan", "camel", "taupe",
-    "brown", "espresso",
-
-    # ✨ Other
-    "gold",
-    "multicolor", "print", "custom"
+    "brown", "espresso", "gold", "multicolor", "print", "custom"
 ]
 
 STYLE_OPTIONS = [
-    "not specified",
-    "classic", "minimal", "casual", "elegant", "edgy", "trendy"
+    "not specified", "classic", "minimal", "casual", "elegant", "edgy", "trendy"
 ]
 
 SEASON_OPTIONS = [
-    "not specified",
-    "all", "warm", "cold"
+    "not specified", "all", "warm", "cold"
 ]
 
 FORMALITY_OPTIONS = [
@@ -59,12 +44,19 @@ FORMALITY_OPTIONS = [
 ]
 
 OCCASION_OPTIONS = [
-    "not specified",
-    "class", "office", "dinner", "wedding", "brunch", "party", "date"
+    "not specified", "class", "office", "dinner", "wedding", "brunch", "party", "date"
 ]
 
 CATEGORY_OPTIONS = [
     "top", "bottom", "shoes", "outerwear", "one_piece", "accessory"
+]
+
+COMFORT_OPTIONS = [
+    "not specified", "very comfortable", "balanced", "fashion first"
+]
+
+BODY_TYPE_OPTIONS = [
+    "not specified", "petite", "tall", "curvy", "straight", "athletic"
 ]
 
 if "closet_message" not in st.session_state:
@@ -112,6 +104,7 @@ with st.form("add_closet_item"):
             CATEGORY_OPTIONS,
             format_func=lambda x: clean_text(x)
         )
+        image_url = st.text_input("Image URL", placeholder="Paste clothing image link")
 
     with c2:
         color = st.selectbox(
@@ -136,6 +129,12 @@ with st.form("add_closet_item"):
             SEASON_OPTIONS,
             format_func=lambda x: clean_text(x)
         )
+        budget = st.text_input("Budget", placeholder="Ex: under $100")
+        comfort = st.selectbox(
+            "Comfort level",
+            COMFORT_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
 
     with c4:
         formality = st.selectbox(
@@ -148,6 +147,12 @@ with st.form("add_closet_item"):
             OCCASION_OPTIONS,
             format_func=lambda x: clean_text(x)
         )
+        body_type = st.selectbox(
+            "Body type",
+            BODY_TYPE_OPTIONS,
+            format_func=lambda x: clean_text(x)
+        )
+        avoid_colors = st.text_input("Colors to avoid", placeholder="Ex: neon, orange")
 
     add_item = st.form_submit_button("Add to Closet")
 
@@ -165,7 +170,12 @@ if add_item and item_name.strip():
         "brand": brand.strip() if brand.strip() else "Unknown",
         "season": season.lower(),
         "formality": formality.lower(),
-        "occasion": occasion.lower()
+        "occasion": occasion.lower(),
+        "image_url": image_url.strip(),
+        "budget": budget.strip(),
+        "comfort": comfort.lower(),
+        "body_type": body_type.lower(),
+        "avoid_colors": avoid_colors.strip().lower()
     })
 
     save_closet_items(closet_items)
@@ -188,6 +198,9 @@ else:
             item = closet_items[idx]
 
             with col:
+                if item.get("image_url"):
+                    st.image(item["image_url"], use_container_width=True)
+
                 st.markdown(
                     f"""
                     <div style="
@@ -209,6 +222,10 @@ else:
                         <div style="color:#6d7283;font-size:0.94rem;">Season: {clean_text(item.get('season'))}</div>
                         <div style="color:#6d7283;font-size:0.94rem;">Dress code: {clean_text(item.get('formality'))}</div>
                         <div style="color:#6d7283;font-size:0.94rem;">Occasion: {clean_text(item.get('occasion'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Budget: {item.get('budget', 'Not specified') or 'Not specified'}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Comfort: {clean_text(item.get('comfort'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Body type: {clean_text(item.get('body_type'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Avoid colors: {item.get('avoid_colors', 'Not specified') or 'Not specified'}</div>
                     </div>
                     """,
                     unsafe_allow_html=True
