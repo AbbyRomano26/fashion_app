@@ -11,6 +11,8 @@ st.set_page_config(
 
 CLOSET_FILE = "closet_items.json"
 
+DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1445205170230-053b83016050"
+
 RECOMMENDED_LOOKS = [
     {
         "title": "Minimal Work Look",
@@ -92,11 +94,18 @@ def toggle_section(section_key):
     st.session_state.home_open_sections[section_key] = not st.session_state.home_open_sections[section_key]
 
 
-def render_piece_card(category, item):
-    image_url = item.get("image_url", "")
+def get_image_url(item):
+    image_url = str(item.get("image_url", "")).strip()
 
-    if image_url:
-        st.image(image_url, use_column_width=True)
+    if not image_url or image_url.lower() in ["not specified", "none", "nan"]:
+        return DEFAULT_IMAGE_URL
+
+    return image_url
+
+
+def render_piece_card(category, item):
+    image_url = get_image_url(item)
+    st.image(image_url, use_column_width=True)
 
     product_url = item.get("product_url", "")
     shop_link_html = ""
@@ -113,7 +122,6 @@ def render_piece_card(category, item):
             <div class="piece-meta">Color: {clean_text(item.get("color", "Unknown"))}</div>
             <div class="piece-meta">Style: {clean_text(item.get("style", "Unknown"))}</div>
             <div class="piece-meta">Occasion: {clean_text(item.get("occasion", "Unknown"))}</div>
-            <div class="piece-meta">Budget: {item.get("budget", "Not specified") or "Not specified"}</div>
             <div class="piece-meta">Comfort: {clean_text(item.get("comfort", "Not specified"))}</div>
             <div class="piece-meta">Body Type: {clean_text(item.get("body_type", "Not specified"))}</div>
             <div class="piece-meta">Avoid Colors: {item.get("avoid_colors", "Not specified") or "Not specified"}</div>
@@ -183,8 +191,7 @@ def render_closet_preview_items(closet_items):
     newest_items = list(reversed(closet_items))[:4]
 
     for item in newest_items:
-        if item.get("image_url"):
-            st.image(item["image_url"], use_column_width=True)
+        st.image(get_image_url(item), use_column_width=True)
 
         st.markdown(
             f"""
@@ -194,7 +201,7 @@ def render_closet_preview_items(closet_items):
                     {clean_text(item.get("category", "item"))} • {item.get("brand", "Unknown")}
                 </div>
                 <div class="closet-mini-meta">
-                    Budget: {item.get("budget", "Not specified") or "Not specified"} • Comfort: {clean_text(item.get("comfort", "Not specified"))}
+                    Comfort: {clean_text(item.get("comfort", "Not specified"))}
                 </div>
             </div>
             """,
