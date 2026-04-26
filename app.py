@@ -93,6 +93,17 @@ def toggle_section(section_key):
 
 
 def render_piece_card(category, item):
+    image_url = item.get("image_url", "")
+
+    if image_url:
+        st.image(image_url, use_column_width=True)
+
+    product_url = item.get("product_url", "")
+    shop_link_html = ""
+
+    if product_url:
+        shop_link_html = f'<a href="{product_url}" target="_blank" class="shop-link">Browse Similar</a>'
+
     st.markdown(
         f"""
         <div class="piece-card">
@@ -102,7 +113,11 @@ def render_piece_card(category, item):
             <div class="piece-meta">Color: {clean_text(item.get("color", "Unknown"))}</div>
             <div class="piece-meta">Style: {clean_text(item.get("style", "Unknown"))}</div>
             <div class="piece-meta">Occasion: {clean_text(item.get("occasion", "Unknown"))}</div>
-            <a href="{item["product_url"]}" target="_blank" class="shop-link">Browse Similar</a>
+            <div class="piece-meta">Budget: {item.get("budget", "Not specified") or "Not specified"}</div>
+            <div class="piece-meta">Comfort: {clean_text(item.get("comfort", "Not specified"))}</div>
+            <div class="piece-meta">Body Type: {clean_text(item.get("body_type", "Not specified"))}</div>
+            <div class="piece-meta">Avoid Colors: {item.get("avoid_colors", "Not specified") or "Not specified"}</div>
+            {shop_link_html}
         </div>
         """,
         unsafe_allow_html=True
@@ -112,9 +127,11 @@ def render_piece_card(category, item):
 def render_badges(badges):
     if not badges:
         return
+
     badge_html = ""
     for badge in badges:
         badge_html += f'<span class="pill">{clean_text(badge)}</span>'
+
     st.markdown(badge_html, unsafe_allow_html=True)
 
 
@@ -143,11 +160,14 @@ def render_outfit_summary(result):
     render_badges(result.get("badges", []))
 
     items = list(result["items"].items())
+
     for i in range(0, len(items), 2):
         cols = st.columns(2, gap="large")
+
         for j, col in enumerate(cols):
             if i + j < len(items):
                 category, item = items[i + j]
+
                 with col:
                     render_piece_card(category, item)
 
@@ -163,12 +183,18 @@ def render_closet_preview_items(closet_items):
     newest_items = list(reversed(closet_items))[:4]
 
     for item in newest_items:
+        if item.get("image_url"):
+            st.image(item["image_url"], use_column_width=True)
+
         st.markdown(
             f"""
             <div class="closet-mini-card">
                 <div class="closet-mini-name">{clean_text(item.get("item_name", "Unnamed Item"))}</div>
                 <div class="closet-mini-meta">
                     {clean_text(item.get("category", "item"))} • {item.get("brand", "Unknown")}
+                </div>
+                <div class="closet-mini-meta">
+                    Budget: {item.get("budget", "Not specified") or "Not specified"} • Comfort: {clean_text(item.get("comfort", "Not specified"))}
                 </div>
             </div>
             """,
@@ -438,17 +464,19 @@ st.markdown(
 )
 
 with st.sidebar:
-    st.image("logo.png", use_column_width=True)
+    if os.path.exists("logo.png"):
+        st.image("logo.png", use_column_width=True)
+
     st.markdown("### Navigation")
     st.page_link("app.py", label="Home", icon="🏠")
-    st.page_link("pages/1_Generate_Outfit.py", label="Generate Outfit", icon="✨")
-    st.page_link("pages/2_Saved_Outfits.py", label="Saved Outfits", icon="🖤")
-    st.page_link("pages/3_My_Closet.py", label="My Closet", icon="🧥")
+
+    if os.path.exists("pages/3_My_Closet.py"):
+        st.page_link("pages/3_My_Closet.py", label="My Closet", icon="🧥")
+
     st.markdown(
         """
         <div class="sidebar-note">
-            Browse curated looks here, use Generate Outfit for custom filtering,
-            My Closet to manage your pieces, and Saved Outfits to organize looks.
+            Browse curated looks here and use My Closet to add personalized items with images.
         </div>
         """,
         unsafe_allow_html=True
@@ -458,7 +486,7 @@ st.markdown(
     """
     <div class="hero-wrap">
         <div class="hero-title">Good morning</div>
-        <div class="hero-subtitle">Here’s your best look for today.</div>
+        <div class="hero-subtitle">Here’s your best visual outfit recommendation for today.</div>
     </div>
     """,
     unsafe_allow_html=True
@@ -471,7 +499,7 @@ with top_col1:
         """
         <div class="top-card suggested-card">
             <div class="card-title">Today’s Suggested Outfit</div>
-            <div class="card-subtitle">A ready-to-browse outfit recommendation.</div>
+            <div class="card-subtitle">A visual outfit recommendation using available closet and sample items.</div>
         """,
         unsafe_allow_html=True
     )
@@ -495,7 +523,7 @@ with top_col2:
         """
         <div class="top-card">
             <div class="card-title">Your Closet</div>
-            <div class="card-subtitle">Newest items you’ve added to your closet.</div>
+            <div class="card-subtitle">Newest personalized items you’ve added.</div>
         """,
         unsafe_allow_html=True
     )
@@ -503,14 +531,17 @@ with top_col2:
     render_closet_preview_items(closet_items)
 
     closet_footer_col1, closet_footer_col2 = st.columns([2, 1])
+
     with closet_footer_col1:
         st.markdown(
             f'<div class="closet-footer">{len(closet_items)} item(s) saved</div>',
             unsafe_allow_html=True
         )
+
     with closet_footer_col2:
-        if st.button("See All Closet", key="see_all_closet_btn"):
-            st.switch_page("pages/3_My_Closet.py")
+        if os.path.exists("pages/3_My_Closet.py"):
+            if st.button("See All Closet", key="see_all_closet_btn"):
+                st.switch_page("pages/3_My_Closet.py")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
