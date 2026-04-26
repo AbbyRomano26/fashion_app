@@ -11,7 +11,7 @@ st.set_page_config(
 
 CLOSET_FILE = "closet_items.json"
 
-DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1445205170230-053b83016050"
+DEFAULT_IMAGE_URL = "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80"
 
 RECOMMENDED_LOOKS = [
     {
@@ -96,17 +96,13 @@ def toggle_section(section_key):
 
 def get_image_url(item):
     image_url = str(item.get("image_url", "")).strip()
-
-    if not image_url or image_url.lower() in ["not specified", "none", "nan"]:
+    if not image_url or image_url.lower() in ["not specified", "none", "nan", ""]:
         return DEFAULT_IMAGE_URL
-
     return image_url
 
 
 def render_piece_card(category, item):
     image_url = get_image_url(item)
-    st.image(image_url, use_column_width=True)
-
     product_url = item.get("product_url", "")
     shop_link_html = ""
 
@@ -116,15 +112,20 @@ def render_piece_card(category, item):
     st.markdown(
         f"""
         <div class="piece-card">
+            <img src="{image_url}" style="
+                width: 100%;
+                height: 220px;
+                object-fit: cover;
+                border-radius: 14px;
+                margin-bottom: 0.75rem;
+                display: block;
+            " />
             <div class="piece-label">{clean_text(category)}</div>
             <div class="piece-name">{clean_text(item.get("item_name", "Unnamed Item"))}</div>
             <div class="piece-meta">Brand: {item.get("brand", "Unknown")}</div>
             <div class="piece-meta">Color: {clean_text(item.get("color", "Unknown"))}</div>
             <div class="piece-meta">Style: {clean_text(item.get("style", "Unknown"))}</div>
             <div class="piece-meta">Occasion: {clean_text(item.get("occasion", "Unknown"))}</div>
-            <div class="piece-meta">Comfort: {clean_text(item.get("comfort", "Not specified"))}</div>
-            <div class="piece-meta">Body Type: {clean_text(item.get("body_type", "Not specified"))}</div>
-            <div class="piece-meta">Avoid Colors: {item.get("avoid_colors", "Not specified") or "Not specified"}</div>
             {shop_link_html}
         </div>
         """,
@@ -175,7 +176,6 @@ def render_outfit_summary(result):
         for j, col in enumerate(cols):
             if i + j < len(items):
                 category, item = items[i + j]
-
                 with col:
                     render_piece_card(category, item)
 
@@ -191,17 +191,21 @@ def render_closet_preview_items(closet_items):
     newest_items = list(reversed(closet_items))[:4]
 
     for item in newest_items:
-        st.image(get_image_url(item), use_column_width=True)
-
+        img_url = get_image_url(item)
         st.markdown(
             f"""
             <div class="closet-mini-card">
+                <img src="{img_url}" style="
+                    width: 100%;
+                    height: 180px;
+                    object-fit: cover;
+                    border-radius: 12px;
+                    margin-bottom: 0.6rem;
+                    display: block;
+                " />
                 <div class="closet-mini-name">{clean_text(item.get("item_name", "Unnamed Item"))}</div>
                 <div class="closet-mini-meta">
                     {clean_text(item.get("category", "item"))} • {item.get("brand", "Unknown")}
-                </div>
-                <div class="closet-mini-meta">
-                    Comfort: {clean_text(item.get("comfort", "Not specified"))}
                 </div>
             </div>
             """,
@@ -377,7 +381,6 @@ st.markdown(
         border: 1px solid #e8e3eb;
         border-radius: 20px;
         padding: 1rem;
-        min-height: 210px;
         box-shadow: 0 8px 18px rgba(40, 36, 48, 0.04);
         margin-top: 0.8rem;
         margin-bottom: 0.6rem;
@@ -493,7 +496,7 @@ st.markdown(
     """
     <div class="hero-wrap">
         <div class="hero-title">Good morning</div>
-        <div class="hero-subtitle">Here’s your best visual outfit recommendation for today.</div>
+        <div class="hero-subtitle">Here's your best visual outfit recommendation for today.</div>
     </div>
     """,
     unsafe_allow_html=True
@@ -505,7 +508,7 @@ with top_col1:
     st.markdown(
         """
         <div class="top-card suggested-card">
-            <div class="card-title">Today’s Suggested Outfit</div>
+            <div class="card-title">Today's Suggested Outfit</div>
             <div class="card-subtitle">A visual outfit recommendation using available closet and sample items.</div>
         """,
         unsafe_allow_html=True
@@ -520,7 +523,7 @@ with top_col1:
     else:
         st.markdown('<div class="empty-note">No strong suggestion available yet.</div>', unsafe_allow_html=True)
 
-    if st.button("View Today’s Outfit Summary", key="today_summary_btn"):
+    if st.button("View Today's Outfit Summary", key="today_summary_btn"):
         toggle_section("today")
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -530,7 +533,7 @@ with top_col2:
         """
         <div class="top-card">
             <div class="card-title">Your Closet</div>
-            <div class="card-subtitle">Newest personalized items you’ve added.</div>
+            <div class="card-subtitle">Newest personalized items you've added.</div>
         """,
         unsafe_allow_html=True
     )
