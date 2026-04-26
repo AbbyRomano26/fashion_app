@@ -28,7 +28,7 @@ SAMPLE_ITEMS = [
         "occasion": "office",
         "product_url": "",
         "brand": "Everlane",
-        "image_url": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c",
+        "image_url": "https://images.unsplash.com/photo-1520975916090-3105956dac38",
         "budget": "under $100",
         "comfort": "balanced",
         "body_type": "not specified",
@@ -60,7 +60,7 @@ SAMPLE_ITEMS = [
         "occasion": "office",
         "product_url": "",
         "brand": "Sam Edelman",
-        "image_url": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2",
+        "image_url": "https://images.unsplash.com/photo-1549298916-b41d501d3772",
         "budget": "under $150",
         "comfort": "balanced",
         "body_type": "not specified",
@@ -92,7 +92,7 @@ SAMPLE_ITEMS = [
         "occasion": "brunch",
         "product_url": "",
         "brand": "Aritzia",
-        "image_url": "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7",
+        "image_url": "https://images.unsplash.com/photo-1618354691438-25bc04584c23",
         "budget": "under $150",
         "comfort": "very comfortable",
         "body_type": "petite",
@@ -108,7 +108,7 @@ SAMPLE_ITEMS = [
         "occasion": "dinner",
         "product_url": "",
         "brand": "Mejuri",
-        "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908",
+        "image_url": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338",
         "budget": "under $100",
         "comfort": "very comfortable",
         "body_type": "not specified",
@@ -134,6 +134,8 @@ def normalize_item(item):
         "body_type": "not specified",
         "avoid_colors": ""
     }
+
+    return {**defaults, **item}
 
     normalized = {}
     for key, default in defaults.items():
