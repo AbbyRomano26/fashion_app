@@ -2,62 +2,24 @@ import json
 import os
 import streamlit as st
 
-st.set_page_config(
-    page_title="My Closet",
-    page_icon="🧥",
-    layout="wide"
-)
+st.set_page_config(page_title="My Closet", page_icon="🧥", layout="wide")
 
 CLOSET_FILE = "closet_items.json"
 
 COLOR_OPTIONS = [
-    "not specified",
-    "red", "orange", "yellow", "green", "blue", "purple",
-    "pink", "blush", "hot pink", "coral", "peach", "mustard",
-    "mint", "sage", "olive", "emerald", "teal",
-    "light blue", "navy", "denim",
-    "lavender", "lilac", "violet", "plum",
-    "burgundy", "maroon",
-    "black", "white", "gray", "charcoal", "silver",
-    "cream", "beige", "tan", "camel", "taupe",
-    "brown", "espresso", "gold", "multicolor", "print", "custom"
+    "not specified", "red", "orange", "yellow", "green", "blue", "purple",
+    "pink", "cream", "beige", "brown", "black", "white", "gray",
+    "navy", "denim", "gold", "silver", "multicolor", "print", "custom"
 ]
 
-STYLE_OPTIONS = [
-    "not specified", "classic", "minimal", "casual", "elegant", "edgy", "trendy"
-]
+STYLE_OPTIONS = ["not specified", "classic", "minimal", "casual", "elegant", "edgy", "trendy"]
+SEASON_OPTIONS = ["not specified", "all", "warm", "cold"]
+FORMALITY_OPTIONS = ["not specified", "casual", "smart_casual", "business_casual", "business_formal", "formal", "cocktail", "streetwear", "date_night"]
+OCCASION_OPTIONS = ["not specified", "class", "office", "dinner", "wedding", "brunch", "party", "date"]
+CATEGORY_OPTIONS = ["top", "bottom", "shoes", "outerwear", "one_piece", "accessory"]
 
-SEASON_OPTIONS = [
-    "not specified", "all", "warm", "cold"
-]
-
-FORMALITY_OPTIONS = [
-    "not specified",
-    "casual",
-    "smart_casual",
-    "business_casual",
-    "business_formal",
-    "formal",
-    "cocktail",
-    "streetwear",
-    "date_night"
-]
-
-OCCASION_OPTIONS = [
-    "not specified", "class", "office", "dinner", "wedding", "brunch", "party", "date"
-]
-
-CATEGORY_OPTIONS = [
-    "top", "bottom", "shoes", "outerwear", "one_piece", "accessory"
-]
-
-COMFORT_OPTIONS = [
-    "not specified", "very comfortable", "balanced", "fashion first"
-]
-
-BODY_TYPE_OPTIONS = [
-    "not specified", "petite", "tall", "curvy", "straight", "athletic"
-]
+COMFORT_OPTIONS = ["not specified", "very comfortable", "balanced", "fashion first"]
+BODY_TYPE_OPTIONS = ["not specified", "petite", "tall", "curvy", "straight", "athletic"]
 
 if "closet_message" not in st.session_state:
     st.session_state.closet_message = ""
@@ -107,7 +69,6 @@ with st.form("add_closet_item"):
         custom_color = ""
         if color == "custom":
             custom_color = st.text_input("Custom color", placeholder="Ex: taupe")
-
         style = st.selectbox("Style", STYLE_OPTIONS, format_func=lambda x: clean_text(x))
 
     with c3:
@@ -125,7 +86,7 @@ with st.form("add_closet_item"):
     add_item = st.form_submit_button("Add to Closet")
 
 if add_item and item_name.strip():
-    final_color = custom_color.strip().lower() if color == "custom" else color.lower()
+    final_color = custom_color.strip().lower() if color == "custom" and custom_color.strip() else color.lower()
 
     closet_items.append({
         "item_name": item_name.strip().replace("_", " "),
@@ -144,23 +105,24 @@ if add_item and item_name.strip():
     })
 
     save_closet_items(closet_items)
-    st.session_state.closet_message = f'"{item_name}" added to closet.'
+    st.session_state.closet_message = f'"{item_name.strip()}" added to closet.'
     st.rerun()
 
 if not closet_items:
-    st.info("Your closet is empty.")
+    st.info("Your closet is empty. Add a few staple pieces to get started.")
 else:
     st.markdown("### Closet Items")
     cols_per_row = 3
 
-    for i in range(0, len(closet_items), cols_per_row):
+    for row_start in range(0, len(closet_items), cols_per_row):
         cols = st.columns(cols_per_row)
 
-        for j, col in enumerate(cols):
-            if i + j >= len(closet_items):
+        for offset, col in enumerate(cols):
+            if row_start + offset >= len(closet_items):
                 continue
 
-            item = closet_items[i + j]
+            idx = row_start + offset
+            item = closet_items[idx]
 
             with col:
                 if item.get("image_url"):
@@ -168,20 +130,33 @@ else:
 
                 st.markdown(
                     f"""
-                    **{clean_text(item.get('item_name'))}**
-
-                    Category: {clean_text(item.get('category'))}
-
-                    Color: {clean_text(item.get('color'))}
-
-                    Style: {clean_text(item.get('style'))}
-
-                    Brand: {item.get('brand')}
-
-                    Budget: {item.get('budget', 'Not specified')}
-
-                    Comfort: {clean_text(item.get('comfort'))}
-
-                    Body type: {clean_text(item.get('body_type'))}
-                    """
+                    <div style="
+                        background:white;
+                        border:1px solid #e8e3eb;
+                        border-radius:22px;
+                        padding:1rem;
+                        min-height:220px;
+                        box-shadow:0 8px 20px rgba(40,36,48,0.04);
+                        margin-bottom:1rem;
+                    ">
+                        <div style="font-size:1.05rem;font-weight:800;color:#1f2230;margin-bottom:0.35rem;">
+                            {clean_text(item.get('item_name', 'Unnamed Item'))}
+                        </div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Category: {clean_text(item.get('category'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Color: {clean_text(item.get('color'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Style: {clean_text(item.get('style'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Brand: {item.get('brand', 'Unknown')}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Budget: {item.get('budget', 'Not specified') or 'Not specified'}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Comfort: {clean_text(item.get('comfort'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Body type: {clean_text(item.get('body_type'))}</div>
+                        <div style="color:#6d7283;font-size:0.94rem;">Avoid colors: {item.get('avoid_colors', 'Not specified') or 'Not specified'}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
                 )
+
+                if st.button(f'Delete {clean_text(item.get("item_name", "Item"))}', key=f"delete_closet_{idx}"):
+                    closet_items.pop(idx)
+                    save_closet_items(closet_items)
+                    st.session_state.closet_message = "Closet item removed."
+                    st.rerun()
