@@ -438,7 +438,7 @@ st.markdown(
 )
 
 with st.sidebar:
-    st.image("logo.png", use_container_width=True)
+    st.image("logo.png", use_column_width=True)
     st.markdown("### Navigation")
     st.page_link("app.py", label="Home", icon="🏠")
     st.page_link("pages/1_Generate_Outfit.py", label="Generate Outfit", icon="✨")
