@@ -99,68 +99,33 @@ with st.form("add_closet_item"):
 
     with c1:
         item_name = st.text_input("Item name", placeholder="White Button Down")
-        category = st.selectbox(
-            "Category",
-            CATEGORY_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        category = st.selectbox("Category", CATEGORY_OPTIONS, format_func=lambda x: clean_text(x))
         image_url = st.text_input("Image URL", placeholder="Paste clothing image link")
 
     with c2:
-        color = st.selectbox(
-            "Color",
-            COLOR_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        color = st.selectbox("Color", COLOR_OPTIONS, format_func=lambda x: clean_text(x))
         custom_color = ""
         if color == "custom":
             custom_color = st.text_input("Custom color", placeholder="Ex: taupe")
 
-        style = st.selectbox(
-            "Style",
-            STYLE_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        style = st.selectbox("Style", STYLE_OPTIONS, format_func=lambda x: clean_text(x))
 
     with c3:
         brand = st.text_input("Brand", placeholder="Everlane")
-        season = st.selectbox(
-            "Season",
-            SEASON_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        season = st.selectbox("Season", SEASON_OPTIONS, format_func=lambda x: clean_text(x))
         budget = st.text_input("Budget", placeholder="Ex: under $100")
-        comfort = st.selectbox(
-            "Comfort level",
-            COMFORT_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        comfort = st.selectbox("Comfort level", COMFORT_OPTIONS, format_func=lambda x: clean_text(x))
 
     with c4:
-        formality = st.selectbox(
-            "Dress code",
-            FORMALITY_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
-        occasion = st.selectbox(
-            "Occasion",
-            OCCASION_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
-        body_type = st.selectbox(
-            "Body type",
-            BODY_TYPE_OPTIONS,
-            format_func=lambda x: clean_text(x)
-        )
+        formality = st.selectbox("Dress code", FORMALITY_OPTIONS, format_func=lambda x: clean_text(x))
+        occasion = st.selectbox("Occasion", OCCASION_OPTIONS, format_func=lambda x: clean_text(x))
+        body_type = st.selectbox("Body type", BODY_TYPE_OPTIONS, format_func=lambda x: clean_text(x))
         avoid_colors = st.text_input("Colors to avoid", placeholder="Ex: neon, orange")
 
     add_item = st.form_submit_button("Add to Closet")
 
 if add_item and item_name.strip():
-    if color == "custom":
-        final_color = custom_color.strip().lower() if custom_color.strip() else "not specified"
-    else:
-        final_color = color.lower()
+    final_color = custom_color.strip().lower() if color == "custom" else color.lower()
 
     closet_items.append({
         "item_name": item_name.strip().replace("_", " "),
@@ -179,63 +144,44 @@ if add_item and item_name.strip():
     })
 
     save_closet_items(closet_items)
-    st.session_state.closet_message = f'"{item_name.strip().replace("_", " ")}" added to closet.'
+    st.session_state.closet_message = f'"{item_name}" added to closet.'
     st.rerun()
 
 if not closet_items:
-    st.info("Your closet is empty. Add a few staple pieces to get started.")
+    st.info("Your closet is empty.")
 else:
     st.markdown("### Closet Items")
     cols_per_row = 3
 
-    for row_start in range(0, len(closet_items), cols_per_row):
+    for i in range(0, len(closet_items), cols_per_row):
         cols = st.columns(cols_per_row)
-        for offset, col in enumerate(cols):
-            if row_start + offset >= len(closet_items):
+
+        for j, col in enumerate(cols):
+            if i + j >= len(closet_items):
                 continue
 
-            idx = row_start + offset
-            item = closet_items[idx]
+            item = closet_items[i + j]
 
             with col:
                 if item.get("image_url"):
-                    st.image(item["image_url"], use_container_width=True)
+                    st.image(item["image_url"], use_column_width=True)
 
                 st.markdown(
                     f"""
-                    <div style="
-                        background:white;
-                        border:1px solid #e8e3eb;
-                        border-radius:22px;
-                        padding:1rem;
-                        min-height:220px;
-                        box-shadow:0 8px 20px rgba(40,36,48,0.04);
-                        margin-bottom:1rem;
-                    ">
-                        <div style="font-size:1.05rem;font-weight:800;color:#1f2230;margin-bottom:0.35rem;">
-                            {clean_text(item.get('item_name', 'Unnamed Item'))}
-                        </div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Category: {clean_text(item.get('category'), 'Unknown')}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Color: {clean_text(item.get('color'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Style: {clean_text(item.get('style'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Brand: {item.get('brand', 'Unknown')}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Season: {clean_text(item.get('season'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Dress code: {clean_text(item.get('formality'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Occasion: {clean_text(item.get('occasion'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Budget: {item.get('budget', 'Not specified') or 'Not specified'}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Comfort: {clean_text(item.get('comfort'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Body type: {clean_text(item.get('body_type'))}</div>
-                        <div style="color:#6d7283;font-size:0.94rem;">Avoid colors: {item.get('avoid_colors', 'Not specified') or 'Not specified'}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                    **{clean_text(item.get('item_name'))}**
 
-                if st.button(
-                    f'Delete {clean_text(item.get("item_name", "Item"))}',
-                    key=f"delete_closet_{idx}"
-                ):
-                    closet_items.pop(idx)
-                    save_closet_items(closet_items)
-                    st.session_state.closet_message = "Closet item removed."
-                    st.rerun()
+                    Category: {clean_text(item.get('category'))}
+
+                    Color: {clean_text(item.get('color'))}
+
+                    Style: {clean_text(item.get('style'))}
+
+                    Brand: {item.get('brand')}
+
+                    Budget: {item.get('budget', 'Not specified')}
+
+                    Comfort: {clean_text(item.get('comfort'))}
+
+                    Body type: {clean_text(item.get('body_type'))}
+                    """
+                )
