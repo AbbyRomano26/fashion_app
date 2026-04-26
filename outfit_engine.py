@@ -1,7 +1,10 @@
-import pandas as pd
+import json
+import os
 import random
+import pandas as pd
 
 DATA_PATH = "data/clothing_items.csv"
+CLOSET_FILE = "closet_items.json"
 
 FORMALITY_COMPATIBILITY = {
     "casual": ["casual", "smart_casual", "streetwear"],
@@ -14,9 +17,162 @@ FORMALITY_COMPATIBILITY = {
     "date_night": ["date_night", "cocktail", "formal"]
 }
 
+SAMPLE_ITEMS = [
+    {
+        "item_name": "White Button Down",
+        "category": "top",
+        "formality": "business_casual",
+        "season": "all",
+        "color": "white",
+        "style": "minimal",
+        "occasion": "office",
+        "product_url": "",
+        "brand": "Everlane",
+        "image_url": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c",
+        "budget": "under $100",
+        "comfort": "balanced",
+        "body_type": "not specified",
+        "avoid_colors": ""
+    },
+    {
+        "item_name": "Black Straight Pants",
+        "category": "bottom",
+        "formality": "business_casual",
+        "season": "all",
+        "color": "black",
+        "style": "classic",
+        "occasion": "office",
+        "product_url": "",
+        "brand": "Uniqlo",
+        "image_url": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1",
+        "budget": "under $100",
+        "comfort": "very comfortable",
+        "body_type": "straight",
+        "avoid_colors": ""
+    },
+    {
+        "item_name": "Black Loafers",
+        "category": "shoes",
+        "formality": "smart_casual",
+        "season": "all",
+        "color": "black",
+        "style": "classic",
+        "occasion": "office",
+        "product_url": "",
+        "brand": "Sam Edelman",
+        "image_url": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2",
+        "budget": "under $150",
+        "comfort": "balanced",
+        "body_type": "not specified",
+        "avoid_colors": ""
+    },
+    {
+        "item_name": "Black Mini Dress",
+        "category": "one_piece",
+        "formality": "date_night",
+        "season": "all",
+        "color": "black",
+        "style": "elegant",
+        "occasion": "dinner",
+        "product_url": "",
+        "brand": "Zara",
+        "image_url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8",
+        "budget": "under $100",
+        "comfort": "balanced",
+        "body_type": "straight",
+        "avoid_colors": "neon"
+    },
+    {
+        "item_name": "Cream Cardigan",
+        "category": "outerwear",
+        "formality": "smart_casual",
+        "season": "cold",
+        "color": "cream",
+        "style": "minimal",
+        "occasion": "brunch",
+        "product_url": "",
+        "brand": "Aritzia",
+        "image_url": "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7",
+        "budget": "under $150",
+        "comfort": "very comfortable",
+        "body_type": "petite",
+        "avoid_colors": ""
+    },
+    {
+        "item_name": "Gold Hoop Earrings",
+        "category": "accessory",
+        "formality": "smart_casual",
+        "season": "all",
+        "color": "gold",
+        "style": "classic",
+        "occasion": "dinner",
+        "product_url": "",
+        "brand": "Mejuri",
+        "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908",
+        "budget": "under $100",
+        "comfort": "very comfortable",
+        "body_type": "not specified",
+        "avoid_colors": ""
+    }
+]
+
+
+def normalize_item(item):
+    defaults = {
+        "item_name": "Unnamed Item",
+        "category": "top",
+        "formality": "not specified",
+        "season": "all",
+        "color": "not specified",
+        "style": "not specified",
+        "occasion": "not specified",
+        "product_url": "",
+        "brand": "Unknown",
+        "image_url": "",
+        "budget": "Not specified",
+        "comfort": "not specified",
+        "body_type": "not specified",
+        "avoid_colors": ""
+    }
+
+    normalized = {}
+    for key, default in defaults.items():
+        value = item.get(key, default)
+        if pd.isna(value):
+            value = default
+        normalized[key] = str(value).strip()
+
+    return normalized
+
+
+def load_closet_items():
+    if os.path.exists(CLOSET_FILE):
+        with open(CLOSET_FILE, "r", encoding="utf-8") as f:
+            items = json.load(f)
+        return [normalize_item(item) for item in items]
+    return []
+
+
+def load_csv_items():
+    if not os.path.exists(DATA_PATH) or os.path.getsize(DATA_PATH) == 0:
+        return SAMPLE_ITEMS
+
+    try:
+        df = pd.read_csv(DATA_PATH, encoding="utf-8-sig")
+        if df.empty:
+            return SAMPLE_ITEMS
+        return [normalize_item(row.to_dict()) for _, row in df.iterrows()]
+    except Exception:
+        return SAMPLE_ITEMS
+
 
 def load_clothing_data():
-    return pd.read_csv(DATA_PATH, encoding="utf-8-sig")
+    closet_items = load_closet_items()
+    csv_items = load_csv_items()
+
+    # Use user's closet first. If closet is too small, add sample items so recommendations still work.
+    all_items = closet_items + csv_items
+    return pd.DataFrame(all_items)
 
 
 def score_item(row, dress_code, occasion, weather, style, color):
@@ -29,7 +185,6 @@ def score_item(row, dress_code, occasion, weather, style, color):
     item_style = str(row["style"]).strip().lower()
     item_color = str(row["color"]).strip().lower()
 
-    # Formality scoring
     if item_formality == "not specified":
         score += 1
     elif item_formality == dress_code:
@@ -39,14 +194,12 @@ def score_item(row, dress_code, occasion, weather, style, color):
         score += 3
         reasons.append("compatible dress code")
 
-    # Occasion scoring
     if item_occasion == "not specified":
         score += 1
     elif item_occasion == occasion:
         score += 4
         reasons.append("occasion match")
 
-    # Weather/season scoring
     if weather == "all":
         score += 1
     elif item_season == "not specified":
@@ -58,7 +211,6 @@ def score_item(row, dress_code, occasion, weather, style, color):
         score += 2
         reasons.append("all-season piece")
 
-    # Style scoring
     if style == "any":
         score += 1
     elif item_style == "not specified":
@@ -67,7 +219,6 @@ def score_item(row, dress_code, occasion, weather, style, color):
         score += 3
         reasons.append("style match")
 
-    # Color scoring
     if color == "any":
         score += 1
     elif item_color == "not specified":
@@ -75,6 +226,10 @@ def score_item(row, dress_code, occasion, weather, style, color):
     elif item_color == color:
         score += 2
         reasons.append("color preference")
+
+    if str(row.get("image_url", "")).strip():
+        score += 1
+        reasons.append("visual available")
 
     return score, reasons
 
@@ -93,8 +248,13 @@ def prepare_scored_items(df, dress_code, occasion, weather, style, color):
             "color": row["color"],
             "style": row["style"],
             "occasion": row["occasion"],
-            "product_url": row["product_url"] if pd.notna(row["product_url"]) else "",
-            "brand": row["brand"] if pd.notna(row["brand"]) else "Unknown",
+            "product_url": row.get("product_url", ""),
+            "brand": row.get("brand", "Unknown"),
+            "image_url": row.get("image_url", ""),
+            "budget": row.get("budget", "Not specified"),
+            "comfort": row.get("comfort", "not specified"),
+            "body_type": row.get("body_type", "not specified"),
+            "avoid_colors": row.get("avoid_colors", ""),
             "score": score,
             "reasons": reasons
         }
@@ -122,13 +282,14 @@ def pick_best_item(items, category, used_names=None):
 
 def generate_explanation(outfit_items, dress_code, occasion, weather, style, color):
     piece_names = [item["item_name"] for item in outfit_items.values()]
+
     explanation_parts = [
         f"This outfit is built for a {dress_code.replace('_', ' ')} look",
         f"with a focus on {occasion}."
     ]
 
     if weather != "all":
-        explanation_parts.append(f"It also takes {weather} weather into account.")
+        explanation_parts.append(f"It also considers {weather} weather.")
 
     if style != "any":
         explanation_parts.append(f"The pieces lean {style.replace('_', ' ')} in style.")
@@ -136,49 +297,24 @@ def generate_explanation(outfit_items, dress_code, occasion, weather, style, col
     if color != "any":
         explanation_parts.append(f"It includes your preference for {color} tones where possible.")
 
+    explanation_parts.append("It also shows images when available, so users can evaluate the look visually.")
     explanation_parts.append(f"Selected pieces: {', '.join(piece_names)}.")
+
     return " ".join(explanation_parts)
 
 
 def build_reason_summary(outfit_items):
-    badge_counts = {
-        "exact dress code match": 0,
-        "compatible dress code": 0,
-        "occasion match": 0,
-        "seasonal fit": 0,
-        "all-season piece": 0,
-        "style match": 0,
-        "color preference": 0
-    }
+    badges = []
 
     for item in outfit_items.values():
         for reason in item.get("reasons", []):
-            if reason in badge_counts:
-                badge_counts[reason] += 1
-
-    badges = []
-
-    if badge_counts["exact dress code match"] >= 2:
-        badges.append("strong dress code fit")
-    elif badge_counts["compatible dress code"] >= 2:
-        badges.append("flexible dress code fit")
-
-    if badge_counts["occasion match"] >= 2:
-        badges.append("occasion-ready")
-
-    if badge_counts["seasonal fit"] + badge_counts["all-season piece"] >= 2:
-        badges.append("weather-aware")
-
-    if badge_counts["style match"] >= 1:
-        badges.append("style-aligned")
-
-    if badge_counts["color preference"] >= 1:
-        badges.append("color-aware")
+            if reason not in badges:
+                badges.append(reason)
 
     if not badges:
         badges.append("balanced recommendation")
 
-    return badges
+    return badges[:5]
 
 
 def generate_outfit(dress_code, occasion, weather, style, color):
@@ -197,15 +333,14 @@ def generate_outfit(dress_code, occasion, weather, style, color):
             "main_piece": one_piece,
             "shoes": shoes
         }
+
         used_names.update([one_piece["item_name"], shoes["item_name"]])
 
         if outerwear and outerwear["item_name"] not in used_names:
             outfit["outerwear"] = outerwear
-            used_names.add(outerwear["item_name"])
 
         if accessory and accessory["item_name"] not in used_names:
             outfit["accessory"] = accessory
-            used_names.add(accessory["item_name"])
 
         return {
             "success": True,
@@ -227,12 +362,7 @@ def generate_outfit(dress_code, occasion, weather, style, color):
         used_names.add(shoes["item_name"])
 
     outerwear = pick_best_item(scored_items, "outerwear", used_names)
-    if outerwear and outerwear["item_name"] not in used_names:
-        used_names.add(outerwear["item_name"])
-
     accessory = pick_best_item(scored_items, "accessory", used_names)
-    if accessory and accessory["item_name"] not in used_names:
-        used_names.add(accessory["item_name"])
 
     if top and bottom and shoes:
         outfit = {
@@ -256,5 +386,5 @@ def generate_outfit(dress_code, occasion, weather, style, color):
 
     return {
         "success": False,
-        "message": "Not enough pieces were available to build this outfit. Try adding more items or broadening your preferences."
+        "message": "Not enough pieces were available to build this outfit. Try adding more items."
     }
